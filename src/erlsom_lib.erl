@@ -842,7 +842,9 @@ getFile(Location, IncludeDirs) ->
   end.
 
 httpGetFile(URL) ->
-  case httpc:request(get, {URL, [{"user-agent", "erlsom"}]}, [], []) of
+  Opts = [{ssl,utils:ssl_client_opts(URL)}],
+
+  case httpc:request(get, {URL, [{"user-agent", "erlsom"}]},Opts, []) of
 		{ok,{{_HTTP,200,_OK}, _Headers, Body}} ->
 			toUnicode(Body);
 		{ok,{{_HTTP,RC,Emsg}, _Headers, _Body}} ->
@@ -910,7 +912,8 @@ prefix(Namespace) ->
 %%% slightly modified
 %%% --------------------------------------------------------------------
 get_url("http://"++_ = URL) ->
-    case httpc:request(URL) of
+	Opts = [{ssl,utils:ssl_client_opts(URL)}],
+    case httpc:request(get,{URL,[]},Opts,[]) of
 	{ok, {{_HTTP, 200, _OK}, _Headers, Body}} -> 
 	    case http_uri:parse(URL) of
 		{ok, {_Method, _, _Host, _Port, _Path, _Qargs}} ->
